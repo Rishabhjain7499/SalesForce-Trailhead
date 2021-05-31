@@ -24,3 +24,17 @@ trigger RestrictContactByName on Contact (before insert, before update) {
 
 =========================APEX TEST CLASS=========================
 
+@isTest
+public class TestRestrictContactByName {
+	@isTest
+    static void testContactRestrictionByName(){
+        Contact con =new Contact(LastName = 'INVALIDNAME');
+        
+        Test.startTest();
+        Database.SaveResult res=Database.insert(con,false);
+        Test.stopTest();
+        
+        System.assert(!res.isSuccess());
+        system.assertEquals('The Last Name "INVALIDNAME" is not allowed for DML',res.getErrors()[0].getMessage());
+    }  
+}
