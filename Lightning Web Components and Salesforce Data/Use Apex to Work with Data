@@ -1,0 +1,79 @@
+Deploy a Component That Lists Contacts
+Create a Lightning web component that uses @wire in an Apex controller to retrieve contact records. Display the contact records in a lightning-datatable.
+
+Tip: Remember that JavaScript is a case-sensitive programming language. Be careful to use uppercase and lowercase letters correctly.
+
+Create an Apex controller that retrieves a list of contacts:
+Class: ContactController
+Method: getContacts()
+Fields to query: FirstName, LastName, Email
+Create a Lightning web component that displays contacts in a table:
+Component name: contactList
+Base component: lightning-datatable
+Fields to include: FirstName, LastName, Email
+Wire the getContacts() method
+Add the component to the Working with Data page
+
+====================================================== Contactcontroler.cls ==========================================================================
+
+public with sharing class ContactController{
+    @AuraEnabled(cacheable=true)
+    public static List<Contact> getContacts() {
+        return 
+           [SELECT id, FirstName, LastName, Email
+           FROM Contact
+                  
+             
+      ];
+    }
+}
+
+====================================================== contactList.html ==========================================================================
+<template>
+    <lightning-card >        
+        <template if:true={contacts.data}>
+            <lightning-datatable
+                key-field="LastName"
+                data={contacts.data}
+                columns={columns}
+            >
+           </lightning-datatable>
+        </template>
+    </lightning-card>
+</template>
+
+====================================================== contactList.js ==========================================================================
+
+import { LightningElement, wire } from 'lwc';
+import First_Name from '@salesforce/schema/Contact.FirstName';
+import Last_Name from '@salesforce/schema/Contact.LastName';
+import Email from '@salesforce/schema/Contact.Email';
+import getContacts from '@salesforce/apex/ContactController.getContacts';
+
+const COLUMNS = [
+    { label: 'First Name', fieldName: First_Name.fieldApiName, type: 'text' },
+    { label: 'Last Name', fieldName: Last_Name.fieldApiName, type: 'text' },
+    { label: 'Email', fieldName: Email.fieldApiName, type: 'Email' }
+];
+
+export default class ContactList extends LightningElement {
+
+columns = COLUMNS;
+@wire(getContacts)
+contacts;
+}
+
+
+====================================================== contactList.js-meta.xml ==========================================================================
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>48.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__AppPage</target>
+    </targets>
+</LightningComponentBundle>
+
+
+
+
