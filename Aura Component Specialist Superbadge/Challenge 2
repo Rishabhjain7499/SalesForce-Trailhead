@@ -1,0 +1,158 @@
+========================================== BoatSearchForm.cmp =============================================
+
+<aura:component controller="BoatSearchFormController" implements="flexipage:availableForAllPageTypes">
+	
+    <aura:attribute name="BoatType" type="Boat__c[]" />
+    <aura:attribute name="selectedType" type="String" />
+    <aura:attribute name="renderNew" type="boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:layout horizontalAlign="Center" verticalAlign="center">
+        <lightning:layoutItem padding="horizontal-medium" >
+    	<lightning:select aura:id="boatTypes" name="SelectType" onchange="{!c.handlechange}" >
+        	<option value=""> All types </option>
+        	<aura:iteration items="{!v.BoatType}" var="boatType">
+            	<option value="{!boatType.id}" text="{boatType.Name}"/>
+        	</aura:iteration>
+        </lightning:select>
+     </lightning:layoutItem>
+        
+    <lightning:layoutItem >
+        <div>
+            <lightning:button label="Search" variant="brand" onclick="{!c.search}"/>
+            <aura:if isTrue="{!v.renderNew}">
+                <lightning:button label="New" variant="neutral" onclick="{!c.newBoat}"/>
+            </aura:if>
+        </div>
+    </lightning:layoutItem>
+        
+    </lightning:layout>
+</aura:component>
+
+======================================================= BoatSearchFormController.js ====================================================================
+
+({
+    doInit : function(component, event, helper){
+        helper.loadBoatTypes(component);
+        var createNewBoat = $A.get("e.force:createRecord");
+        if (createNewBoat) {
+            component.set("v.renderNew", true);
+        }else{
+             component.set("v.renderNew", false);
+        }
+    },
+
+    handleChange : function(component, event, helper){
+        console.log(component.find("boatTypes").get("v.value"));
+        component.set("v.selectedType", component.find("boatTypes").get("v.value"));
+    },
+
+    search : function(component, event, helper){
+        var selectedType = component.get("v.selectedType");
+        console.log("Search button pressed " + selectedType);
+    },
+
+    newBoat : function(component, event, helper){
+        var boatTypeId = component.get("v.selectedType");
+        console.log("New button pressed " + boatTypeId);
+        var requestNewBoat = component.getEvent("launchNewBoatForm");
+        if(requestNewBoat){
+            requestNewBoat.setParams({"boatTypeId": boatTypeId});
+            requestNewBoat.fire();
+        }else{
+            console.log("Action not supported");
+        }
+    },
+
+    launchNewBoatForm: function(component, event, helper){
+        console.log("handleNewBoatForm handler called.")
+        var boatTypeId = component.get("v.selectedType");
+        console.log(boatTypeId);
+        var createNewBoat = $A.get("e.force:createRecord");
+        if (createNewBoat) {
+            createNewBoat.setParams({"entityApiName": "Boat__c"});
+            if(! boatTypeId==""){
+                createNewBoat.setParams({"defaultFieldValues": {'BoatType__c': boatTypeId}})
+            };
+            createNewBoat.fire();
+        }else{
+            console.log("Action not supported");
+        }
+    },
+    //more handlers here
+})
+
+========================================================== BoatSearchformHelper.js ======================================================================================
+
+({
+	  loadBoatTypes : function(component,event) {
+        var action=component.get("c.getBoatTypes");
+       
+        action.setCallback(this,function(response) {
+            var state= response.getState();
+            if(state==='SUCCESS'){
+                component.set("v.BoatTypes",response.getReturnValue());
+            }
+            else {
+                console.log("Failed with state: " + state);
+            }
+        });
+        $A.enqueueAction(action);
+	}
+})
+
+
+=============================================================  BoatSearchFormController.apx =====================================================================
+
+public with sharing class BoatSearchFormController {
+	@AuraEnabled
+    public static List<BoatType__c> getBoatTypes(){
+        return [Select Name, Id from BoatType__c ];
+    }
+}
+
+========================================================== BoatSearchResults.cmp ==========================================
+
+<aura:component controller="BoatSearchResults" implements="flexipage:availableForAllPageTypes">
+    <article class="slds-card slds-m-bottom_large">
+        <div class="slds-media__body">
+            <div >
+                 <lightning:layout horizontalAlign="center" verticalAlign="center">
+                    <lightning:layoutItem padding="horizontal-medium" >
+                      Test
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </div>
+    </article>
+</aura:component>	
+
+
+===========================================================  BoatSearch.cmp ====================================================================
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+    <lightning:card title="Find a Boat" class="slds-m-top_10px">
+        <c:BoatSearchForm />
+    </lightning:card>
+    <lightning:card title="Matching Boats">
+         <c:BoatSearchResults />
+    </lightning:card>
+</aura:component>
+
+=========================================================== FriendswithBoats.app  ===============================================================================
+
+<aura:application extends="force:slds" >
+    <lightning:layout >
+    <div class="slds-grid slds-gutters">
+          <div class="slds-col slds-size_2-of-3">
+            <c.BoatSearch/>
+          </div>
+          <div class="slds-col slds-size_1-of-3">
+            <span></span>
+          </div>
+    </div>
+      </lightning:layout>
+</aura:application>
+
+
