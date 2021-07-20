@@ -1,0 +1,32 @@
+ ======================================================= BoatSearchForm.cmp. ===============================================
+<aura:registerEvent name="formsubmit" type="c:Formsubmit"/>
+
+ ====================================================== BoatSearchForm.js ==============================================
+onFormSubmit : function(component, event, helper){
+        var BoattypeId = component.get("v.selectedType");
+        console.log("Boat Type Id: "+BoattypeId);
+        
+        var formSubmit = component.getEvent("formsubmit");
+        formSubmit.setParams({"formdata" :
+                              {"boatTypeId" : BoattypeId}
+                             });
+        formSubmit.fire();
+    },
+
+= ================================================================= BoatSearch.cmp ===================================================
+<aura:handler name="formsubmit" event="c:Formsubmit" action="{!c.onFormSubmit}"/>
+
+=================================================================== BoatSearch.js ====================================================
+
+	onFormSubmit : function(component, event, helper) {
+		var formData=event.getParams("formData");
+        var boatSearchResultsCmp=component.find("boatSearchResultsCmp");
+        if(boatSearchResultsCmp){
+            boatSearchResultsCmp.search(formData.boatTypeId);
+        }
+	}
+
+======================================================================= Formsubmit.evt =================================================
+<aura:event type="COMPONENT" description="Event template">
+    <aura:attribute name="formdata" type="Object"/>
+</aura:event>
