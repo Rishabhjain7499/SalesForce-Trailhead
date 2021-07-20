@@ -16,6 +16,67 @@ public with sharing class BoatSearchResults {
        }
     }
 }
+==============================================================  BoatSearchresults.cmp  ==============================================================================
+
+<aura:component controller="BoatSearchResults" implements="flexipage:availableForAllPageTypes">
+    <aura:attribute name="boats" type="Boat__c[]"/>
+    <aura:attribute name="boatTypeId" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+      <aura:method name="search" action="{!c.doSearch}"> 
+        <aura:attribute name="boatTypeId" type="String"/> 
+      </aura:method>
+    
+    <lightning:layout multipleRows="true" horizontalAlign="center" >
+    	<aura:iteration items="{!v.boats}" var="boatVar">
+        	<lightning:layoutItem class="slds-m-right_small">
+                <c:BoatTile boat="{!boatVar}"/>
+            </lightning:layoutItem>
+        </aura:iteration>
+        
+        <aura:if isTrue="{!lessthan(v.boats.length,1)}">
+        	<lightning:layout class="slds-align_absolute-center" >
+                <ui:outputText value="No Boats Found" />
+            </lightning:layout>
+        </aura:if>
+    </lightning:layout> 
+</aura:component>
+
+==============================================================  BoatSearchResults.controller.js  ==============================================================================
+
+({
+	doInit : function(component, event, helper) {
+		helper.onSearch(component);
+	},
+    
+     doSearch : function(component, event, helper) {
+        var params = event.getParam('arguments');
+        component.set("v.boatTypeId", params.boatTypeId);
+		helper.onSearch(component);
+	},
+    
+})
+
+==============================================================  BoatSearchResults.helper  ==============================================================================
+
+({
+	onSearch : function(component, event, helper) {
+        console.log('In Helper');
+		var action=component.get('c.getBoats');
+        action.setParams({
+            "boatTypeId" : component.get("v.boatTypeId")
+        });
+        action.setCallback(this,function(response) {
+            if(response.getState === 'SUCCESS')
+            {
+                var boatslist = response.getReturnValue();
+                component.set("v.boats",boatslist);
+            }
+        });
+        $A.enqueueAction(action);
+	}
+})
 
 ==============================================================  BoatTile.cmp  ==============================================================================
 
@@ -32,4 +93,31 @@ public with sharing class BoatSearchResults {
 
 </aura:component>
 
-=======================================================    ====================================================================================
+=======================================================  BoatTile.css  ====================================================================================
+
+.THIS.tile {
+    position:relative;
+    display: inline-block;
+    width: 100%;
+    height: 220px;
+    padding: 1px !important;
+}
+
+.THIS.innertile {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+}
+.THIS.lower-third {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #FFFFFF;
+    background-color: rgba(0, 0, 0, .4);
+    padding: 6px 8px;
+}
+
+==============================================================    ======================================================================
