@@ -13,7 +13,7 @@
     	<lightning:select aura:id="boatTypes" name="SelectType" onchange="{!c.handlechange}" >
         	<option value=""> All types </option>
         	<aura:iteration items="{!v.BoatType}" var="boatType">
-            	<option value="{!boatType.id}" text="{boatType.Name}"/>
+            	<option value="{!boatType.id}" text="{!boatType.Name}"/>
         	</aura:iteration>
         </lightning:select>
      </lightning:layoutItem>
