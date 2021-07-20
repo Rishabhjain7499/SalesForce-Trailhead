@@ -54,18 +54,6 @@
     },
 
     newBoat : function(component, event, helper){
-        var boatTypeId = component.get("v.selectedType");
-        console.log("New button pressed " + boatTypeId);
-        var requestNewBoat = component.getEvent("launchNewBoatForm");
-        if(requestNewBoat){
-            requestNewBoat.setParams({"boatTypeId": boatTypeId});
-            requestNewBoat.fire();
-        }else{
-            console.log("Action not supported");
-        }
-    },
-
-    launchNewBoatForm: function(component, event, helper){
         console.log("handleNewBoatForm handler called.")
         var boatTypeId = component.get("v.selectedType");
         console.log(boatTypeId);
