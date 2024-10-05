@@ -1,0 +1,65 @@
+In Postman, Select Composite -> Post Composite
+Paste this code
+
+{
+    "allOrNone": true,
+    "compositeRequest": [
+        {
+            "method": "POST",
+            "url": "/services/data/v{{version}}/sobjects/Contact",
+            "referenceId": "newContact",
+            "body": {
+                "firstName": "Emily",
+                "lastName": "Cloudshine",
+                "email": "emily.cloudshine@abc.com"
+            }
+        },
+        {
+            "method": "POST",
+            "url": "/services/data/v{{version}}/sobjects/Opportunity",
+            "referenceId": "newOpportunity",
+            "body": {
+                "name": "Advanced Training",
+                "stageName": "Prospecting",
+                "closeDate": "2024-12-30",
+                "contactId": "@{newContact.id}"
+            }
+        },
+        {
+            "method": "POST",
+            "url": "/services/data/v{{version}}/sobjects/Task",
+            "referenceId": "newtask1",
+            "body": {
+                "subject": "Follow-up on advanced Training",
+                "Priority": "High",
+                "WhatId": "@{newOpportunity.id}",
+                "WhoId": "@{newContact.id}",
+                "status": "Not started"
+            }
+        },
+        {
+            "method": "POST",
+            "url": "/services/data/v{{version}}/sobjects/Task",
+            "referenceId": "newtask2",
+            "body": {
+                "subject": "Learning Resources",
+                "Priority": "Normal",
+                "WhoId": "@{newContact.id}",
+                "status": "Not started"
+            }
+        },
+        {
+            "method": "POST",
+            "url": "/services/data/v{{version}}/sobjects/Case",
+            "referenceId": "newCase",
+            "body": {
+                "subject": "Class Survey",
+                "Priority": "Low",
+                "status": "New",
+                "contactId": "@{newContact.id}"
+            }
+        }
+    ]
+}
+
+Click Send 
