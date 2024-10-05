@@ -1,0 +1,27 @@
+Connect to Postman with the Integration User in your special Developer Edition org to import all of these records accurately so our sales team can start contacting them.
+To do that, the steps are:
+1. Authorize your org with Integration User from Postman
+2. In Postman, Search salesforce Platform API, select Bulk v2, then Select create a Job
+Add this code in Body:
+{
+    "object": "Lead",
+    "operation": "insert",
+    "contentType": "CSV",
+    "lineEnding": "LF"
+}
+Click Send
+then check in Org, setup-> Bulk  Data load jobs-> there is a Job in progress
+Then,
+In Postman, Select Put Upload job data,
+In body-> binary- > add the CSV file
+Click Send
+Then,
+In Postman, select Patch CLose or abort a Job,
+In body -> Raw -
+{
+	"state":"UploadComplete"
+}
+Click send
+Then, In org, the Job is done and data is inserted.
+Note:
+We can check Job Id in ORg and check it in Postman Variable tab as well.
